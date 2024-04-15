@@ -105,17 +105,14 @@ class Main(QMainWindow):
 
     def preview(self):
 
-        # Open preview dialog
         preview = QPrintPreviewDialog()
 
-        # If a print is requested, open print dialog
         preview.paintRequested.connect(lambda p: self.text.print_(p))
 
         preview.exec_()
 
     def print(self):
 
-        # Open printing dialog
         dialog = QPrintDialog()
 
         if dialog.exec_() == QDialog.Accepted:
