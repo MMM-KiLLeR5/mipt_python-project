@@ -18,10 +18,8 @@ class Main(QMainWindow):
         self.initFormatbar()
         self.init_menu_bar()
 
-        # Initialize a statusbar for the window
         self.statusbar = self.statusBar()
 
-        # x and y coordinates on the screen, width, height
         self.setGeometry(100, 100, 1030, 800)
 
         self.setWindowTitle("Writer")
@@ -29,7 +27,6 @@ class Main(QMainWindow):
     def init_tool_bar(self):
         self.toolbar = self.addToolBar("Options")
 
-        # Makes the next toolbar appear underneath this one
         self.addToolBarBreak()
 
     def initFormatbar(self):
