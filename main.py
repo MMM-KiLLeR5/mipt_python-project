@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QAction, QFileDialog
+from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QAction, QFileDialog, QDialog
 
 
 class Main(QMainWindow):
@@ -51,6 +52,19 @@ class Main(QMainWindow):
         self.toolbar.addSeparator()
 
         self.addToolBarBreak()
+        self.print_action = QAction(QIcon("icons/print.png"), "Print document", self)
+        self.print_action.setStatusTip("Print document")
+        self.print_action.setShortcut("Ctrl+P")
+        self.print_action.triggered.connect(self.print)
+
+        self.preview_action = QAction(QIcon("icons/preview.png"), "Page view", self)
+        self.preview_action.setStatusTip("Preview page before printing")
+        self.preview_action.setShortcut("Ctrl+Shift+P")
+        self.preview_action.triggered.connect(self.preview)
+        self.toolbar.addAction(self.print_action)
+        self.toolbar.addAction(self.preview_action)
+
+        self.toolbar.addSeparator()
 
     def init_format_bar(self):
         self.formatbar = self.addToolBar("Format")
@@ -64,6 +78,8 @@ class Main(QMainWindow):
         file.addAction(self.new_action)
         file.addAction(self.open_action)
         file.addAction(self.save_action)
+        file.addAction(self.print_action)
+        file.addAction(self.preview_action)
 
     def new(self):
         spawn = Main(self)
@@ -86,6 +102,24 @@ class Main(QMainWindow):
 
         with open(self.filename, "wt") as file:
             file.write(self.text.toHtml())
+
+    def preview(self):
+
+        # Open preview dialog
+        preview = QPrintPreviewDialog()
+
+        # If a print is requested, open print dialog
+        preview.paintRequested.connect(lambda p: self.text.print_(p))
+
+        preview.exec_()
+
+    def print(self):
+
+        # Open printing dialog
+        dialog = QPrintDialog()
+
+        if dialog.exec_() == QDialog.Accepted:
+            self.text.document().print_(dialog.printer())
 
 
 
