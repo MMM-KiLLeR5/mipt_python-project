@@ -15,7 +15,7 @@ class Main(QMainWindow):
         self.setCentralWidget(self.text)
 
         self.init_tool_bar()
-        self.initFormatbar()
+        self.init_format_bar()
         self.init_menu_bar()
 
         self.statusbar = self.statusBar()
@@ -29,7 +29,7 @@ class Main(QMainWindow):
 
         self.addToolBarBreak()
 
-    def initFormatbar(self):
+    def init_format_bar(self):
         self.formatbar = self.addToolBar("Format")
 
     def init_menu_bar(self):
