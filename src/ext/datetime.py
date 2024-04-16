@@ -1,8 +1,6 @@
-from PyQt5.QtGui import QPushButton
+from PyQt5.QtWidgets import QDialog, QComboBox, QGridLayout, QPushButton
 
 from time import strftime
-
-from PyQt5.QtWidgets import QDialog, QComboBox, QGridLayout
 
 
 class DateTime(QDialog):
