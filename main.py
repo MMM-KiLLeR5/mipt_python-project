@@ -1,4 +1,5 @@
 import sys
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QAction, QFileDialog, QDialog, QFontComboBox, \
@@ -110,6 +111,18 @@ class Main(QMainWindow):
             fmt.setVerticalAlignment(QTextCharFormat.AlignNormal)
 
         self.text.setCurrentCharFormat(fmt)
+
+    def align_left(self):
+        self.text.setAlignment(Qt.AlignLeft)
+
+    def align_right(self):
+        self.text.setAlignment(Qt.AlignRight)
+
+    def align_center(self):
+        self.text.setAlignment(Qt.AlignCenter)
+
+    def align_justify(self):
+        self.text.setAlignment(Qt.AlignJustify)
 
     def init_tool_bar(self):
         self.new_action = QAction(QIcon("icons/new.png"), "New", self)
@@ -236,6 +249,18 @@ class Main(QMainWindow):
         sub_action = QAction(QIcon("icons/sub_script.png"), "sub_script", self)
         sub_action.triggered.connect(self.sub_script)
 
+        align_left = QAction(QIcon("icons/align-left.png"), "Align left", self)
+        align_left.triggered.connect(self.align_left)
+
+        align_center = QAction(QIcon("icons/align-center.png"), "Align center", self)
+        align_center.triggered.connect(self.align_center)
+
+        align_right = QAction(QIcon("icons/align-right.png"), "Align right", self)
+        align_right.triggered.connect(self.align_right)
+
+        align_justify = QAction(QIcon("icons/align-justify.png"), "Align justify", self)
+        align_justify.triggered.connect(self.align_justify)
+
         self.formatbar.addWidget(font_box)
         self.formatbar.addWidget(font_size)
 
@@ -249,6 +274,10 @@ class Main(QMainWindow):
         self.formatbar.addAction(strike_action)
         self.formatbar.addAction(super_action)
         self.formatbar.addAction(sub_action)
+        self.formatbar.addAction(align_left)
+        self.formatbar.addAction(align_center)
+        self.formatbar.addAction(align_right)
+        self.formatbar.addAction(align_justify)
 
         self.formatbar.addSeparator()
 
