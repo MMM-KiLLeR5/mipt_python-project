@@ -1,8 +1,8 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont, QTextCursor, QImage
+from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont, QTextCursor, QImage, QContextMenuEvent
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
 from PyQt5.QtWidgets import QMainWindow, QTextEdit, QAction, QFileDialog, QDialog, QFontComboBox, \
-    QComboBox, QColorDialog, QMessageBox
+    QComboBox, QColorDialog, QMessageBox, QMenu
 from src.ext import *
 
 
@@ -96,6 +96,11 @@ class TextEditor(QMainWindow):
         date_time_action.setShortcut("Ctrl+D")
         date_time_action.triggered.connect(datetime.DateTime(self).show)
 
+        table_action = QAction(QIcon("icons/table.png"), "Insert table", self)
+        table_action.setStatusTip("Insert table")
+        table_action.setShortcut("Ctrl+T")
+        table_action.triggered.connect(table.Table(self).show)
+
         self.toolbar = self.addToolBar("Options")
 
         self.toolbar.addAction(self.new_action)
@@ -127,6 +132,9 @@ class TextEditor(QMainWindow):
         self.toolbar.addAction(numbered_action)
 
         self.toolbar.addAction(date_time_action)
+
+        self.toolbar.addAction(table_action)
+
 
         self.addToolBarBreak()
 
@@ -266,6 +274,9 @@ class TextEditor(QMainWindow):
         self.text.setTabStopWidth(33)
         self.setWindowIcon(QIcon("icons/icon.png"))
         self.text.cursorPositionChanged.connect(self.cursor_position)
+
+        self.text.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.text.customContextMenuRequested.connect(self.context)
 
     def font_family(self, font):
         self.text.setCurrentFont(font)
@@ -527,3 +538,121 @@ class TextEditor(QMainWindow):
         wc.get_text()
 
         wc.show()
+
+    def context(self, pos):
+
+        cursor = self.text.textCursor()
+
+        table = cursor.currentTable()
+        if table:
+
+            menu = QMenu(self)
+
+            append_row_action = QAction("Append row", self)
+            append_row_action.triggered.connect(lambda: table.appendRows(1))
+
+            append_col_action = QAction("Append column", self)
+            append_col_action.triggered.connect(lambda: table.appendColumns(1))
+
+            remove_row_action = QAction("Remove row", self)
+            remove_row_action.triggered.connect(self.remove_row)
+
+            remove_col_action = QAction("Remove column", self)
+            remove_col_action.triggered.connect(self.remove_col)
+
+            insert_row_action = QAction("Insert row", self)
+            insert_row_action.triggered.connect(self.insert_row)
+
+            insert_col_action = QAction("Insert column", self)
+            insert_col_action.triggered.connect(self.insert_col)
+
+            merge_action = QAction("Merge cells", self)
+            merge_action.triggered.connect(lambda: table.mergeCells(cursor))
+
+            if not cursor.hasSelection():
+                merge_action.setEnabled(False)
+
+            split_action = QAction("Split cells", self)
+
+            cell = table.cellAt(cursor)
+            if cell.rowSpan() > 1 or cell.columnSpan() > 1:
+
+                split_action.triggered.connect(lambda: table.splitCell(cell.row(), cell.column(), 1, 1))
+
+            else:
+                split_action.setEnabled(False)
+
+            menu.addAction(append_row_action)
+            menu.addAction(append_col_action)
+
+            menu.addSeparator()
+
+            menu.addAction(remove_row_action)
+            menu.addAction(remove_col_action)
+
+            menu.addSeparator()
+
+            menu.addAction(insert_row_action)
+            menu.addAction(insert_col_action)
+
+            menu.addSeparator()
+
+            menu.addAction(merge_action)
+            menu.addAction(split_action)
+
+            pos = self.mapToGlobal(pos)
+            if self.toolbar.isVisible():
+                pos.setY(pos.y() + 45)
+
+            if self.formatbar.isVisible():
+                pos.setY(pos.y() + 45)
+
+            menu.move(pos)
+
+            menu.show()
+
+        else:
+
+            event = QContextMenuEvent(QContextMenuEvent.Mouse, QPoint())
+
+            self.text.contextMenuEvent(event)
+
+    def remove_row(self):
+
+        cursor = self.text.textCursor()
+
+        table = cursor.currentTable()
+
+        cell = table.cellAt(cursor)
+
+        table.remove_rows(cell.row(), 1)
+
+    def remove_col(self):
+
+        cursor = self.text.textCursor()
+        table = cursor.currentTable()
+
+        cell = table.cellAt(cursor)
+
+        table.remove_columns(cell.column(), 1)
+
+    def insert_row(self):
+
+        cursor = self.text.textCursor()
+
+        table = cursor.currentTable()
+
+        cell = table.cellAt(cursor)
+
+        table.insert_rows(cell.row(), 1)
+
+    def insert_col(self):
+
+        cursor = self.text.textCursor()
+
+        
+        table = cursor.currentTable()
+
+        cell = table.cellAt(cursor)
+
+        table.insert_columns(cell.column(), 1)
