@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QTextListFormat
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QAction, QFileDialog, QDialog
 
@@ -79,6 +79,15 @@ class Main(QMainWindow):
         self.redo_action.setShortcut("Ctrl+Y")
         self.redo_action.triggered.connect(self.text.redo)
 
+        bullet_action = QAction(QIcon("icons/bullet.png"), "Insert bullet List", self)
+        bullet_action.setStatusTip("Insert bullet list")
+        bullet_action.setShortcut("Ctrl+Shift+B")
+        bullet_action.triggered.connect(self.bullet_list)
+
+        numbered_action = QAction(QIcon("icons/number.png"), "Insert numbered List", self)
+        numbered_action.setStatusTip("Insert numbered list")
+        numbered_action.setShortcut("Ctrl+Shift+L")
+        numbered_action.triggered.connect(self.number_list)
 
         self.toolbar = self.addToolBar("Options")
 
@@ -92,6 +101,8 @@ class Main(QMainWindow):
         self.toolbar.addAction(self.paste_action)
         self.toolbar.addAction(self.undo_action)
         self.toolbar.addAction(self.redo_action)
+        self.toolbar.addAction(bullet_action)
+        self.toolbar.addAction(numbered_action)
 
         self.toolbar.addSeparator()
 
@@ -151,6 +162,18 @@ class Main(QMainWindow):
 
         if dialog.exec_() == QDialog.Accepted:
             self.text.document().print_(dialog.printer())
+
+    def bullet_list(self):
+
+        cursor = self.text.textCursor()
+
+        cursor.insertList(QTextListFormat.ListDisc)
+
+    def number_list(self):
+
+        cursor = self.text.textCursor()
+
+        cursor.insertList(QTextListFormat.ListDecimal)
 
 
 def main():
