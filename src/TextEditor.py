@@ -13,6 +13,8 @@ class TextEditor(QMainWindow):
 
         self.filename = ""
 
+        self.changesSaved = True
+
         self.init_ui()
 
     def init_tool_bar(self):
@@ -134,7 +136,6 @@ class TextEditor(QMainWindow):
         self.toolbar.addAction(date_time_action)
 
         self.toolbar.addAction(table_action)
-
 
         self.addToolBarBreak()
 
@@ -260,23 +261,27 @@ class TextEditor(QMainWindow):
 
     def init_ui(self):
         self.text = QTextEdit(self)
-        self.setCentralWidget(self.text)
+
+        self.text.setTabStopWidth(33)
 
         self.init_tool_bar()
         self.init_format_bar()
         self.init_menu_bar()
 
+        self.setCentralWidget(self.text)
+
         self.statusbar = self.statusBar()
 
-        self.setGeometry(100, 100, 1030, 800)
-
-        self.setWindowTitle("Writer")
-        self.text.setTabStopWidth(33)
-        self.setWindowIcon(QIcon("icons/icon.png"))
         self.text.cursorPositionChanged.connect(self.cursor_position)
 
         self.text.setContextMenuPolicy(Qt.CustomContextMenu)
         self.text.customContextMenuRequested.connect(self.context)
+
+        self.text.textChanged.connect(self.changed)
+
+        self.setGeometry(100, 100, 1030, 800)
+        self.setWindowTitle("Writer")
+        self.setWindowIcon(QIcon("icons/icon.png"))
 
     def font_family(self, font):
         self.text.setCurrentFont(font)
@@ -392,6 +397,8 @@ class TextEditor(QMainWindow):
 
         with open(self.filename, "wt") as file:
             file.write(self.text.toHtml())
+
+        self.changesSaved = True
 
     def preview(self):
 
@@ -650,9 +657,36 @@ class TextEditor(QMainWindow):
 
         cursor = self.text.textCursor()
 
-        
         table = cursor.currentTable()
 
         cell = table.cellAt(cursor)
 
         table.insert_columns(cell.column(), 1)
+
+    def changed(self):
+        self.changesSaved = False
+
+    def closeEvent(self, event):
+
+        if self.changesSaved:
+            event.accept()
+        else:
+            popup = QMessageBox(self)
+            popup.setIcon(QMessageBox.Warning)
+            popup.setText("The document has been modified")
+            popup.setInformativeText("Do you want to save your changes?")
+            popup.setStandardButtons(QMessageBox.Save |
+                                     QMessageBox.Cancel |
+                                     QMessageBox.Discard)
+            popup.setDefaultButton(QMessageBox.Save)
+            answer = popup.exec_()
+            if answer == QMessageBox.Save:
+                self.save()
+                event.accept()
+            elif answer == QMessageBox.Discard:
+                event.accept()
+            else:
+                event.ignore()
+
+
+
