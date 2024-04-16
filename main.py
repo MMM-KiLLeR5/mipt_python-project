@@ -26,6 +26,9 @@ class Main(QMainWindow):
         self.setGeometry(100, 100, 1030, 800)
 
         self.setWindowTitle("Writer")
+        self.text.setTabStopWidth(33)
+        self.setWindowIcon(QIcon("icons/icon.png"))
+        self.text.cursorPositionChanged.connect(self.cursor_position)
 
     def init_tool_bar(self):
         self.new_action = QAction(QIcon("icons/new.png"), "New", self)
@@ -174,6 +177,15 @@ class Main(QMainWindow):
         cursor = self.text.textCursor()
 
         cursor.insertList(QTextListFormat.ListDecimal)
+
+    def cursor_position(self):
+
+        cursor = self.text.textCursor()
+
+        line = cursor.blockNumber() + 1
+        col = cursor.columnNumber()
+
+        self.statusbar.showMessage("Line: {} | Column: {}".format(line, col))
 
 
 def main():
