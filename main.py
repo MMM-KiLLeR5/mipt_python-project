@@ -1,7 +1,8 @@
 import sys
-from PyQt5.QtGui import QIcon, QTextListFormat
+from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QAction, QFileDialog, QDialog
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QAction, QFileDialog, QDialog, QFontComboBox, \
+    QComboBox, QColorDialog
 
 
 class Main(QMainWindow):
@@ -29,6 +30,86 @@ class Main(QMainWindow):
         self.text.setTabStopWidth(33)
         self.setWindowIcon(QIcon("icons/icon.png"))
         self.text.cursorPositionChanged.connect(self.cursor_position)
+
+    def font_family(self, font):
+        self.text.setCurrentFont(font)
+
+    def font_size(self, font_size):
+        self.text.setFontPointSize(int(font_size))
+
+    def font_color(self):
+
+        color = QColorDialog.getColor()
+
+        self.text.setTextColor(color)
+
+    def highlight(self):
+
+        color = QColorDialog.getColor()
+
+        self.text.setTextBackgroundColor(color)
+
+    def bold(self):
+
+        if self.text.fontWeight() == QFont.Bold:
+
+            self.text.setFontWeight(QFont.Normal)
+
+        else:
+
+            self.text.setFontWeight(QFont.Bold)
+
+    def italic(self):
+
+        state = self.text.fontItalic()
+
+        self.text.setFontItalic(not state)
+
+    def underline(self):
+
+        state = self.text.fontUnderline()
+
+        self.text.setFontUnderline(not state)
+
+    def strike(self):
+
+        fmt = self.text.currentCharFormat()
+
+        fmt.setFontStrikeOut(not fmt.fontStrikeOut())
+
+        self.text.setCurrentCharFormat(fmt)
+
+    def super_script(self):
+
+        fmt = self.text.currentCharFormat()
+
+        align = fmt.verticalAlignment()
+
+        if align == QTextCharFormat.AlignNormal:
+
+            fmt.setVerticalAlignment(QTextCharFormat.Alignsuper_script)
+
+        else:
+
+            fmt.setVerticalAlignment(QTextCharFormat.AlignNormal)
+
+        self.text.setCurrentCharFormat(fmt)
+
+    def sub_script(self):
+
+        fmt = self.text.currentCharFormat()
+
+        align = fmt.verticalAlignment()
+
+        if align == QTextCharFormat.AlignNormal:
+
+            fmt.setVerticalAlignment(QTextCharFormat.Alignsub_script)
+
+        else:
+
+            fmt.setVerticalAlignment(QTextCharFormat.AlignNormal)
+
+        self.text.setCurrentCharFormat(fmt)
 
     def init_tool_bar(self):
         self.new_action = QAction(QIcon("icons/new.png"), "New", self)
@@ -111,6 +192,65 @@ class Main(QMainWindow):
 
     def init_format_bar(self):
         self.formatbar = self.addToolBar("Format")
+        font_box = QFontComboBox(self)
+        font_box.currentFontChanged.connect(self.font_family)
+
+        font_size = QComboBox(self)
+        font_size.setEditable(True)
+
+        font_size.setMinimumContentsLength(3)
+
+        font_size.activated.connect(self.font_size)
+
+        font_sizes = ['6', '7', '8', '9', '10', '11', '12', '13', '14',
+                      '15', '16', '18', '20', '22', '24', '26', '28',
+                      '32', '36', '40', '44', '48', '54', '60', '66',
+                      '72', '80', '88', '96']
+
+        for i in font_sizes:
+            font_size.addItem(i)
+
+        font_color = QAction(QIcon("icons/font-color.png"), "Change font color", self)
+        font_color.triggered.connect(self.font_color)
+
+        back_color = QAction(QIcon("icons/highlight.png"), "Change background color", self)
+        back_color.triggered.connect(self.highlight)
+
+        self.formatbar = self.addToolBar("Format")
+
+        bold_action = QAction(QIcon("icons/bold.png"), "Bold", self)
+        bold_action.triggered.connect(self.bold)
+
+        italic_action = QAction(QIcon("icons/italic.png"), "Italic", self)
+        italic_action.triggered.connect(self.italic)
+
+        underl_action = QAction(QIcon("icons/underline.png"), "Underline", self)
+        underl_action.triggered.connect(self.underline)
+
+        strike_action = QAction(QIcon("icons/strike.png"), "Strike-out", self)
+        strike_action.triggered.connect(self.strike)
+
+        super_action = QAction(QIcon("icons/super_script.png"), "super_script", self)
+        super_action.triggered.connect(self.super_script)
+
+        sub_action = QAction(QIcon("icons/sub_script.png"), "sub_script", self)
+        sub_action.triggered.connect(self.sub_script)
+
+        self.formatbar.addWidget(font_box)
+        self.formatbar.addWidget(font_size)
+
+        self.formatbar.addSeparator()
+
+        self.formatbar.addAction(font_color)
+        self.formatbar.addAction(back_color)
+        self.formatbar.addAction(bold_action)
+        self.formatbar.addAction(italic_action)
+        self.formatbar.addAction(underl_action)
+        self.formatbar.addAction(strike_action)
+        self.formatbar.addAction(super_action)
+        self.formatbar.addAction(sub_action)
+
+        self.formatbar.addSeparator()
 
     def init_menu_bar(self):
         menubar = self.menuBar()
