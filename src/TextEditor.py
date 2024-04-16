@@ -1,9 +1,9 @@
-import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont, QTextCursor
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
 from PyQt5.QtWidgets import QMainWindow, QTextEdit, QAction, QFileDialog, QDialog, QFontComboBox, \
     QComboBox, QColorDialog
+from src.ext.find import Find
 
 
 class TextEditor(QMainWindow):
@@ -77,6 +77,11 @@ class TextEditor(QMainWindow):
         numbered_action.setShortcut("Ctrl+Shift+L")
         numbered_action.triggered.connect(self.number_list)
 
+        self.find_action = QAction(QIcon("icons/find.png"), "Find and replace", self)
+        self.find_action.setStatusTip("Find and replace words in your document")
+        self.find_action.setShortcut("Ctrl+F")
+        self.find_action.triggered.connect(Find(self).show)
+
         self.toolbar = self.addToolBar("Options")
 
         self.toolbar.addAction(self.print_action)
@@ -93,6 +98,8 @@ class TextEditor(QMainWindow):
         self.toolbar.addAction(numbered_action)
 
         self.toolbar.addSeparator()
+
+        self.toolbar.addAction(self.find_action)
 
     def init_format_bar(self):
         self.formatbar = self.addToolBar("Format")
@@ -198,6 +205,9 @@ class TextEditor(QMainWindow):
         edit.addAction(self.cut_action)
         edit.addAction(self.copy_action)
         edit.addAction(self.paste_action)
+
+        edit.addAction(self.find_action)
+
         toolbar_action = QAction("Toggle Toolbar", self)
         toolbar_action.triggered.connect(self.toggle_toolbar)
 

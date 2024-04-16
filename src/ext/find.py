@@ -101,7 +101,7 @@ class Find(QDialog):
 
         else:
 
-            self.parent.text.move_cursor(QTextCursor.End)
+            self.parent.text.moveCursor(QTextCursor.End)
 
     def replace(self):
 
