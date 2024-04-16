@@ -4,6 +4,7 @@ from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
 from PyQt5.QtWidgets import QMainWindow, QTextEdit, QAction, QFileDialog, QDialog, QFontComboBox, \
     QComboBox, QColorDialog, QMessageBox
 from src.ext.find import Find
+from src.ext.wordcount import WordCount
 
 
 class TextEditor(QMainWindow):
@@ -31,7 +32,6 @@ class TextEditor(QMainWindow):
         self.save_action.setShortcut("Ctrl+S")
         self.save_action.triggered.connect(self.save)
 
-        self.addToolBarBreak()
         self.print_action = QAction(QIcon("icons/print.png"), "Print document", self)
         self.print_action.setStatusTip("Print document")
         self.print_action.setShortcut("Ctrl+P")
@@ -82,31 +82,47 @@ class TextEditor(QMainWindow):
         self.find_action.setShortcut("Ctrl+F")
         self.find_action.triggered.connect(Find(self).show)
 
-        self.toolbar = self.addToolBar("Options")
-
-        self.toolbar.addAction(self.print_action)
-        self.toolbar.addAction(self.preview_action)
-        self.toolbar.addAction(self.new_action)
-        self.toolbar.addAction(self.open_action)
-        self.toolbar.addAction(self.save_action)
-        self.toolbar.addAction(self.cut_action)
-        self.toolbar.addAction(self.copy_action)
-        self.toolbar.addAction(self.paste_action)
-        self.toolbar.addAction(self.undo_action)
-        self.toolbar.addAction(self.redo_action)
-        self.toolbar.addAction(bullet_action)
-        self.toolbar.addAction(numbered_action)
-
         image_action = QAction(QIcon("icons/image.png"), "Insert image", self)
         image_action.setStatusTip("Insert image")
         image_action.setShortcut("Ctrl+Shift+I")
         image_action.triggered.connect(self.insert_image)
 
-        self.toolbar.addAction(image_action)
+        word_count_action = QAction(QIcon("icons/count.png"), "See word/symbol count", self)
+        word_count_action.setStatusTip("See word/symbol count")
+        word_count_action.setShortcut("Ctrl+W")
+        word_count_action.triggered.connect(self.word_count)
+
+        self.toolbar = self.addToolBar("Options")
+
+        self.toolbar.addAction(self.new_action)
+        self.toolbar.addAction(self.open_action)
+        self.toolbar.addAction(self.save_action)
 
         self.toolbar.addSeparator()
 
+        self.toolbar.addAction(self.print_action)
+        self.toolbar.addAction(self.preview_action)
+
+        self.toolbar.addSeparator()
+
+        self.toolbar.addAction(self.cut_action)
+        self.toolbar.addAction(self.copy_action)
+        self.toolbar.addAction(self.paste_action)
+        self.toolbar.addAction(self.undo_action)
+        self.toolbar.addAction(self.redo_action)
+
+        self.toolbar.addSeparator()
+
+        self.toolbar.addAction(word_count_action)
+        self.toolbar.addAction(image_action)
         self.toolbar.addAction(self.find_action)
+
+        self.toolbar.addSeparator()
+
+        self.toolbar.addAction(bullet_action)
+        self.toolbar.addAction(numbered_action)
+
+        self.addToolBarBreak()
 
     def init_format_bar(self):
         self.formatbar = self.addToolBar("Format")
@@ -479,7 +495,7 @@ class TextEditor(QMainWindow):
     def insert_image(self):
 
         filename, _ = QFileDialog.getOpenFileName(self, 'Insert image', ".",
-                                               "Images (*.png *.xpm *.jpg *.bmp *.gif)")
+                                                  "Images (*.png *.xpm *.jpg *.bmp *.gif)")
 
         image = QImage(filename)
 
@@ -497,3 +513,11 @@ class TextEditor(QMainWindow):
             cursor = self.text.textCursor()
 
             cursor.insertImage(image, filename)
+
+    def word_count(self):
+
+        wc = WordCount(self)
+
+        wc.get_text()
+
+        wc.show()

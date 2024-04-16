@@ -28,7 +28,6 @@ class WordCount(QDialog):
         self.total_words = QLabel(self)
         self.total_symbols = QLabel(self)
 
-        # Layout
 
         layout = QGridLayout(self)
 
