@@ -43,14 +43,6 @@ class Main(QMainWindow):
         self.save_action.setShortcut("Ctrl+S")
         self.save_action.triggered.connect(self.save)
 
-        self.toolbar = self.addToolBar("Options")
-
-        self.toolbar.addAction(self.new_action)
-        self.toolbar.addAction(self.open_action)
-        self.toolbar.addAction(self.save_action)
-
-        self.toolbar.addSeparator()
-
         self.addToolBarBreak()
         self.print_action = QAction(QIcon("icons/print.png"), "Print document", self)
         self.print_action.setStatusTip("Print document")
@@ -61,8 +53,45 @@ class Main(QMainWindow):
         self.preview_action.setStatusTip("Preview page before printing")
         self.preview_action.setShortcut("Ctrl+Shift+P")
         self.preview_action.triggered.connect(self.preview)
+
+        self.cut_action = QAction(QIcon("icons/cut.png"), "Cut to clipboard", self)
+        self.cut_action.setStatusTip("Delete and copy text to clipboard")
+        self.cut_action.setShortcut("Ctrl+X")
+        self.cut_action.triggered.connect(self.text.cut)
+
+        self.copy_action = QAction(QIcon("icons/copy.png"), "Copy to clipboard", self)
+        self.copy_action.setStatusTip("Copy text to clipboard")
+        self.copy_action.setShortcut("Ctrl+C")
+        self.copy_action.triggered.connect(self.text.copy)
+
+        self.paste_action = QAction(QIcon("icons/paste.png"), "Paste from clipboard", self)
+        self.paste_action.setStatusTip("Paste text from clipboard")
+        self.paste_action.setShortcut("Ctrl+V")
+        self.paste_action.triggered.connect(self.text.paste)
+
+        self.undo_action = QAction(QIcon("icons/undo.png"), "Undo last action", self)
+        self.undo_action.setStatusTip("Undo last action")
+        self.undo_action.setShortcut("Ctrl+Z")
+        self.undo_action.triggered.connect(self.text.undo)
+
+        self.redo_action = QAction(QIcon("icons/redo.png"), "Redo last undone thing", self)
+        self.redo_action.setStatusTip("Redo last undone thing")
+        self.redo_action.setShortcut("Ctrl+Y")
+        self.redo_action.triggered.connect(self.text.redo)
+
+
+        self.toolbar = self.addToolBar("Options")
+
         self.toolbar.addAction(self.print_action)
         self.toolbar.addAction(self.preview_action)
+        self.toolbar.addAction(self.new_action)
+        self.toolbar.addAction(self.open_action)
+        self.toolbar.addAction(self.save_action)
+        self.toolbar.addAction(self.cut_action)
+        self.toolbar.addAction(self.copy_action)
+        self.toolbar.addAction(self.paste_action)
+        self.toolbar.addAction(self.undo_action)
+        self.toolbar.addAction(self.redo_action)
 
         self.toolbar.addSeparator()
 
@@ -80,6 +109,11 @@ class Main(QMainWindow):
         file.addAction(self.save_action)
         file.addAction(self.print_action)
         file.addAction(self.preview_action)
+        edit.addAction(self.undo_action)
+        edit.addAction(self.redo_action)
+        edit.addAction(self.cut_action)
+        edit.addAction(self.copy_action)
+        edit.addAction(self.paste_action)
 
     def new(self):
         spawn = Main(self)
@@ -117,8 +151,6 @@ class Main(QMainWindow):
 
         if dialog.exec_() == QDialog.Accepted:
             self.text.document().print_(dialog.printer())
-
-
 
 
 def main():
