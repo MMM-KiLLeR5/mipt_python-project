@@ -3,8 +3,7 @@ from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont, QTextCur
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
 from PyQt5.QtWidgets import QMainWindow, QTextEdit, QAction, QFileDialog, QDialog, QFontComboBox, \
     QComboBox, QColorDialog, QMessageBox
-from src.ext.find import Find
-from src.ext.wordcount import WordCount
+from src.ext import *
 
 
 class TextEditor(QMainWindow):
@@ -80,7 +79,7 @@ class TextEditor(QMainWindow):
         self.find_action = QAction(QIcon("icons/find.png"), "Find and replace", self)
         self.find_action.setStatusTip("Find and replace words in your document")
         self.find_action.setShortcut("Ctrl+F")
-        self.find_action.triggered.connect(Find(self).show)
+        self.find_action.triggered.connect(find.Find(self).show)
 
         image_action = QAction(QIcon("icons/image.png"), "Insert image", self)
         image_action.setStatusTip("Insert image")
@@ -91,6 +90,11 @@ class TextEditor(QMainWindow):
         word_count_action.setStatusTip("See word/symbol count")
         word_count_action.setShortcut("Ctrl+W")
         word_count_action.triggered.connect(self.word_count)
+
+        date_time_action = QAction(QIcon("icons/calender.png"), "Insert current date/time", self)
+        date_time_action.setStatusTip("Insert current date/time")
+        date_time_action.setShortcut("Ctrl+D")
+        date_time_action.triggered.connect(datetime.DateTime(self).show)
 
         self.toolbar = self.addToolBar("Options")
 
@@ -121,6 +125,8 @@ class TextEditor(QMainWindow):
 
         self.toolbar.addAction(bullet_action)
         self.toolbar.addAction(numbered_action)
+
+        self.toolbar.addAction(date_time_action)
 
         self.addToolBarBreak()
 
@@ -516,7 +522,7 @@ class TextEditor(QMainWindow):
 
     def word_count(self):
 
-        wc = WordCount(self)
+        wc = wordcount.WordCount(self)
 
         wc.get_text()
 
