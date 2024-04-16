@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont
+from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont, QTextCursor
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTextEdit, QAction, QFileDialog, QDialog, QFontComboBox, \
     QComboBox, QColorDialog
@@ -14,115 +14,6 @@ class Main(QMainWindow):
         self.filename = ""
 
         self.init_ui()
-
-    def init_ui(self):
-        self.text = QTextEdit(self)
-        self.setCentralWidget(self.text)
-
-        self.init_tool_bar()
-        self.init_format_bar()
-        self.init_menu_bar()
-
-        self.statusbar = self.statusBar()
-
-        self.setGeometry(100, 100, 1030, 800)
-
-        self.setWindowTitle("Writer")
-        self.text.setTabStopWidth(33)
-        self.setWindowIcon(QIcon("icons/icon.png"))
-        self.text.cursorPositionChanged.connect(self.cursor_position)
-
-    def font_family(self, font):
-        self.text.setCurrentFont(font)
-
-    def font_size(self, font_size):
-        self.text.setFontPointSize(int(font_size))
-
-    def font_color(self):
-
-        color = QColorDialog.getColor()
-
-        self.text.setTextColor(color)
-
-    def highlight(self):
-
-        color = QColorDialog.getColor()
-
-        self.text.setTextBackgroundColor(color)
-
-    def bold(self):
-
-        if self.text.fontWeight() == QFont.Bold:
-
-            self.text.setFontWeight(QFont.Normal)
-
-        else:
-
-            self.text.setFontWeight(QFont.Bold)
-
-    def italic(self):
-
-        state = self.text.fontItalic()
-
-        self.text.setFontItalic(not state)
-
-    def underline(self):
-
-        state = self.text.fontUnderline()
-
-        self.text.setFontUnderline(not state)
-
-    def strike(self):
-
-        fmt = self.text.currentCharFormat()
-
-        fmt.setFontStrikeOut(not fmt.fontStrikeOut())
-
-        self.text.setCurrentCharFormat(fmt)
-
-    def super_script(self):
-
-        fmt = self.text.currentCharFormat()
-
-        align = fmt.verticalAlignment()
-
-        if align == QTextCharFormat.AlignNormal:
-
-            fmt.setVerticalAlignment(QTextCharFormat.Alignsuper_script)
-
-        else:
-
-            fmt.setVerticalAlignment(QTextCharFormat.AlignNormal)
-
-        self.text.setCurrentCharFormat(fmt)
-
-    def sub_script(self):
-
-        fmt = self.text.currentCharFormat()
-
-        align = fmt.verticalAlignment()
-
-        if align == QTextCharFormat.AlignNormal:
-
-            fmt.setVerticalAlignment(QTextCharFormat.Alignsub_script)
-
-        else:
-
-            fmt.setVerticalAlignment(QTextCharFormat.AlignNormal)
-
-        self.text.setCurrentCharFormat(fmt)
-
-    def align_left(self):
-        self.text.setAlignment(Qt.AlignLeft)
-
-    def align_right(self):
-        self.text.setAlignment(Qt.AlignRight)
-
-    def align_center(self):
-        self.text.setAlignment(Qt.AlignCenter)
-
-    def align_justify(self):
-        self.text.setAlignment(Qt.AlignJustify)
 
     def init_tool_bar(self):
         self.new_action = QAction(QIcon("icons/new.png"), "New", self)
@@ -261,6 +152,14 @@ class Main(QMainWindow):
         align_justify = QAction(QIcon("icons/align-justify.png"), "Align justify", self)
         align_justify.triggered.connect(self.align_justify)
 
+        indent_action = QAction(QIcon("icons/indent.png"), "Indent Area", self)
+        indent_action.setShortcut("Ctrl+Tab")
+        indent_action.triggered.connect(self.indent)
+
+        dedent_action = QAction(QIcon("icons/dedent.png"), "Dedent Area", self)
+        dedent_action.setShortcut("Shift+Tab")
+        dedent_action.triggered.connect(self.dedent)
+
         self.formatbar.addWidget(font_box)
         self.formatbar.addWidget(font_size)
 
@@ -278,6 +177,8 @@ class Main(QMainWindow):
         self.formatbar.addAction(align_center)
         self.formatbar.addAction(align_right)
         self.formatbar.addAction(align_justify)
+        self.formatbar.addAction(indent_action)
+        self.formatbar.addAction(dedent_action)
 
         self.formatbar.addSeparator()
 
@@ -297,6 +198,115 @@ class Main(QMainWindow):
         edit.addAction(self.cut_action)
         edit.addAction(self.copy_action)
         edit.addAction(self.paste_action)
+
+    def init_ui(self):
+        self.text = QTextEdit(self)
+        self.setCentralWidget(self.text)
+
+        self.init_tool_bar()
+        self.init_format_bar()
+        self.init_menu_bar()
+
+        self.statusbar = self.statusBar()
+
+        self.setGeometry(100, 100, 1030, 800)
+
+        self.setWindowTitle("Writer")
+        self.text.setTabStopWidth(33)
+        self.setWindowIcon(QIcon("icons/icon.png"))
+        self.text.cursorPositionChanged.connect(self.cursor_position)
+
+    def font_family(self, font):
+        self.text.setCurrentFont(font)
+
+    def font_size(self, font_size):
+        self.text.setFontPointSize(int(font_size))
+
+    def font_color(self):
+
+        color = QColorDialog.getColor()
+
+        self.text.setTextColor(color)
+
+    def highlight(self):
+
+        color = QColorDialog.getColor()
+
+        self.text.setTextBackgroundColor(color)
+
+    def bold(self):
+
+        if self.text.fontWeight() == QFont.Bold:
+
+            self.text.setFontWeight(QFont.Normal)
+
+        else:
+
+            self.text.setFontWeight(QFont.Bold)
+
+    def italic(self):
+
+        state = self.text.fontItalic()
+
+        self.text.setFontItalic(not state)
+
+    def underline(self):
+
+        state = self.text.fontUnderline()
+
+        self.text.setFontUnderline(not state)
+
+    def strike(self):
+
+        fmt = self.text.currentCharFormat()
+
+        fmt.setFontStrikeOut(not fmt.fontStrikeOut())
+
+        self.text.setCurrentCharFormat(fmt)
+
+    def super_script(self):
+
+        fmt = self.text.currentCharFormat()
+
+        align = fmt.verticalAlignment()
+
+        if align == QTextCharFormat.AlignNormal:
+
+            fmt.setVerticalAlignment(QTextCharFormat.Alignsuper_script)
+
+        else:
+
+            fmt.setVerticalAlignment(QTextCharFormat.AlignNormal)
+
+        self.text.setCurrentCharFormat(fmt)
+
+    def sub_script(self):
+
+        fmt = self.text.currentCharFormat()
+
+        align = fmt.verticalAlignment()
+
+        if align == QTextCharFormat.AlignNormal:
+
+            fmt.setVerticalAlignment(QTextCharFormat.Alignsub_script)
+
+        else:
+
+            fmt.setVerticalAlignment(QTextCharFormat.AlignNormal)
+
+        self.text.setCurrentCharFormat(fmt)
+
+    def align_left(self):
+        self.text.setAlignment(Qt.AlignLeft)
+
+    def align_right(self):
+        self.text.setAlignment(Qt.AlignRight)
+
+    def align_center(self):
+        self.text.setAlignment(Qt.AlignCenter)
+
+    def align_justify(self):
+        self.text.setAlignment(Qt.AlignJustify)
 
     def new(self):
         spawn = Main(self)
@@ -355,6 +365,68 @@ class Main(QMainWindow):
         col = cursor.columnNumber()
 
         self.statusbar.showMessage("Line: {} | Column: {}".format(line, col))
+
+    def indent(self):
+
+        cursor = self.text.textCursor()
+
+        if cursor.hasSelection():
+
+            temp = cursor.blockNumber()
+
+            cursor.setPosition(cursor.selectionEnd())
+
+            diff = cursor.blockNumber() - temp
+
+            for n in range(diff + 1):
+                cursor.movePosition(QTextCursor.StartOfLine)
+
+                cursor.insertText("\t")
+
+                cursor.movePosition(QTextCursor.Up)
+
+        else:
+
+            cursor.insertText("\t")
+
+    def dedent(self):
+
+        cursor = self.text.textCursor()
+
+        if cursor.hasSelection():
+
+            temp = cursor.blockNumber()
+
+            cursor.setPosition(cursor.selectionEnd())
+
+            diff = cursor.blockNumber() - temp
+
+            for n in range(diff + 1):
+                self.handle_dedent(cursor)
+
+                cursor.movePosition(QTextCursor.Up)
+
+        else:
+            self.handle_dedent(cursor)
+
+    @staticmethod
+    def handle_dedent(cursor):
+
+        cursor.movePosition(QTextCursor.StartOfLine)
+
+        line = cursor.block().text()
+
+        if line.startswith("\t"):
+
+            cursor.deleteChar()
+
+        else:
+            for char in line[:8]:
+
+                if char != " ":
+                    break
+
+                cursor.deleteChar()
 
 
 def main():
