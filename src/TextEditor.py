@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont, QTextCursor
+from PyQt5.QtGui import QIcon, QTextListFormat, QTextCharFormat, QFont, QTextCursor, QImage
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
 from PyQt5.QtWidgets import QMainWindow, QTextEdit, QAction, QFileDialog, QDialog, QFontComboBox, \
-    QComboBox, QColorDialog
+    QComboBox, QColorDialog, QMessageBox
 from src.ext.find import Find
 
 
@@ -96,6 +96,13 @@ class TextEditor(QMainWindow):
         self.toolbar.addAction(self.redo_action)
         self.toolbar.addAction(bullet_action)
         self.toolbar.addAction(numbered_action)
+
+        image_action = QAction(QIcon("icons/image.png"), "Insert image", self)
+        image_action.setStatusTip("Insert image")
+        image_action.setShortcut("Ctrl+Shift+I")
+        image_action.triggered.connect(self.insert_image)
+
+        self.toolbar.addAction(image_action)
 
         self.toolbar.addSeparator()
 
@@ -468,3 +475,25 @@ class TextEditor(QMainWindow):
         state = self.statusbar.isVisible()
 
         self.statusbar.setVisible(not state)
+
+    def insert_image(self):
+
+        filename, _ = QFileDialog.getOpenFileName(self, 'Insert image', ".",
+                                               "Images (*.png *.xpm *.jpg *.bmp *.gif)")
+
+        image = QImage(filename)
+
+        if image.isNull():
+
+            popup = QMessageBox(QMessageBox.Critical,
+                                "Image load error",
+                                "Could not load image file!",
+                                QMessageBox.Ok,
+                                self)
+            popup.show()
+
+        else:
+
+            cursor = self.text.textCursor()
+
+            cursor.insertImage(image, filename)
