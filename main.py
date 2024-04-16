@@ -198,6 +198,18 @@ class Main(QMainWindow):
         edit.addAction(self.cut_action)
         edit.addAction(self.copy_action)
         edit.addAction(self.paste_action)
+        toolbar_action = QAction("Toggle Toolbar", self)
+        toolbar_action.triggered.connect(self.toggle_toolbar)
+
+        formatbar_action = QAction("Toggle Formatbar", self)
+        formatbar_action.triggered.connect(self.toggle_formatbar)
+
+        statusbar_action = QAction("Toggle Statusbar", self)
+        statusbar_action.triggered.connect(self.toggle_statusbar)
+
+        view.addAction(toolbar_action)
+        view.addAction(formatbar_action)
+        view.addAction(statusbar_action)
 
     def init_ui(self):
         self.text = QTextEdit(self)
@@ -428,12 +440,30 @@ class Main(QMainWindow):
 
                 cursor.deleteChar()
 
+    def toggle_toolbar(self):
+
+        state = self.toolbar.isVisible()
+
+        self.toolbar.setVisible(not state)
+
+    def toggle_formatbar(self):
+
+        state = self.formatbar.isVisible()
+
+        self.formatbar.setVisible(not state)
+
+    def toggle_statusbar(self):
+
+        state = self.statusbar.isVisible()
+
+        self.statusbar.setVisible(not state)
+
 
 def main():
     app = QApplication(sys.argv)
 
-    main = Main()
-    main.show()
+    obj = Main()
+    obj.show()
 
     sys.exit(app.exec_())
 
