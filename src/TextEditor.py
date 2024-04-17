@@ -380,7 +380,7 @@ class TextEditor(QMainWindow):
         spawn.show()
 
     def open(self):
-        self.filename = QFileDialog.getOpenFileName(self, 'Open File', ".", "(*.writer)")
+        self.filename = QFileDialog.getOpenFileName(self, 'Open File', ".", "(*.writer)")[0]
 
         if self.filename:
             with open(self.filename, "rt") as file:
@@ -389,15 +389,17 @@ class TextEditor(QMainWindow):
     def save(self):
 
         if not self.filename:
-            self.filename = QFileDialog.getSaveFileName(self, 'Save File')
+            self.filename = QFileDialog.getSaveFileName(self, 'Save File')[0]
 
-        if not self.filename.endswith(".writer"):
-            self.filename += ".writer"
+        if self.filename:
 
-        with open(self.filename, "wt") as file:
-            file.write(self.text.toHtml())
+            if not self.filename.endswith(".writer"):
+                self.filename += ".writer"
 
-        self.changesSaved = True
+            with open(self.filename, "wt") as file:
+                file.write(self.text.toHtml())
+
+            self.changesSaved = True
 
     def preview(self):
 
