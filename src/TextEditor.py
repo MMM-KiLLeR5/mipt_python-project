@@ -354,7 +354,7 @@ class TextEditor(QMainWindow):
 
         if align == QTextCharFormat.AlignNormal:
 
-            fmt.setVerticalAlignment(QTextCharFormat.Alignsub_script)
+            fmt.setVerticalAlignment(QTextCharFormat.AlignSubScript)
 
         else:
 
