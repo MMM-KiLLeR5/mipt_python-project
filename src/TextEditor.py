@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow, QTextEdit, QAction, QFileDialog, QDialo
     QComboBox, QColorDialog, QMessageBox, QMenu, QSpinBox
 from src.ext import *
 from src.Lexic import Lexic
+from src.MenuBar import MenuBar
 
 
 class TextEditor(QMainWindow):
@@ -140,38 +141,6 @@ class TextEditor(QMainWindow):
 
         self.addToolBarBreak()
 
-    def init_menu_bar(self):
-        menubar = self.menuBar()
-
-        file = menubar.addMenu("File")
-        edit = menubar.addMenu("Edit")
-        view = menubar.addMenu("View")
-        file.addAction(self.new_action)
-        file.addAction(self.open_action)
-        file.addAction(self.save_action)
-        file.addAction(self.print_action)
-        file.addAction(self.preview_action)
-        edit.addAction(self.undo_action)
-        edit.addAction(self.redo_action)
-        edit.addAction(self.cut_action)
-        edit.addAction(self.copy_action)
-        edit.addAction(self.paste_action)
-
-        edit.addAction(self.find_action)
-
-        toolbar_action = QAction("Toggle Toolbar", self)
-        toolbar_action.triggered.connect(self.toggle_toolbar)
-
-        formatbar_action = QAction("Toggle Formatbar", self)
-        formatbar_action.triggered.connect(self.toggle_formatbar)
-
-        statusbar_action = QAction("Toggle Statusbar", self)
-        statusbar_action.triggered.connect(self.toggle_statusbar)
-
-        view.addAction(toolbar_action)
-        view.addAction(formatbar_action)
-        view.addAction(statusbar_action)
-
     def init_ui(self):
         self.text = QTextEdit(self)
 
@@ -179,8 +148,7 @@ class TextEditor(QMainWindow):
 
         self.init_tool_bar()
         Lexic.init_format_bar(self)
-        self.init_menu_bar()
-
+        MenuBar.init_menu_bar(self)
         self.setCentralWidget(self.text)
 
         self.statusbar = self.statusBar()
@@ -258,86 +226,6 @@ class TextEditor(QMainWindow):
         col = cursor.columnNumber()
 
         self.statusbar.showMessage("Line: {} | Column: {}".format(line, col))
-
-    def indent(self):
-
-        cursor = self.text.textCursor()
-
-        if cursor.hasSelection():
-
-            temp = cursor.blockNumber()
-
-            cursor.setPosition(cursor.selectionEnd())
-
-            diff = cursor.blockNumber() - temp
-
-            for n in range(diff + 1):
-                cursor.movePosition(QTextCursor.StartOfLine)
-
-                cursor.insertText("\t")
-
-                cursor.movePosition(QTextCursor.Up)
-
-        else:
-
-            cursor.insertText("\t")
-
-    def dedent(self):
-
-        cursor = self.text.textCursor()
-
-        if cursor.hasSelection():
-
-            temp = cursor.blockNumber()
-
-            cursor.setPosition(cursor.selectionEnd())
-
-            diff = cursor.blockNumber() - temp
-
-            for n in range(diff + 1):
-                self.handle_dedent(cursor)
-
-                cursor.movePosition(QTextCursor.Up)
-
-        else:
-            self.handle_dedent(cursor)
-
-    @staticmethod
-    def handle_dedent(cursor):
-
-        cursor.movePosition(QTextCursor.StartOfLine)
-
-        line = cursor.block().text()
-
-        if line.startswith("\t"):
-
-            cursor.deleteChar()
-
-        else:
-            for char in line[:8]:
-
-                if char != " ":
-                    break
-
-                cursor.deleteChar()
-
-    def toggle_toolbar(self):
-
-        state = self.toolbar.isVisible()
-
-        self.toolbar.setVisible(not state)
-
-    def toggle_formatbar(self):
-
-        state = self.formatbar.isVisible()
-
-        self.formatbar.setVisible(not state)
-
-    def toggle_statusbar(self):
-
-        state = self.statusbar.isVisible()
-
-        self.statusbar.setVisible(not state)
 
     def insert_image(self):
 
