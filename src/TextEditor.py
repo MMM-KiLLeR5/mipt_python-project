@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMainWindow, QTextEdit, QAction, QFileDialog, QDialo
 from src.ext import *
 from src.Lexic import Lexic
 from src.MenuBar import MenuBar
+from src.ToolBar import ToolBar
 
 
 class TextEditor(QMainWindow):
@@ -19,134 +20,12 @@ class TextEditor(QMainWindow):
 
         self.init_ui()
 
-    def init_tool_bar(self):
-        self.new_action = QAction(QIcon("icons/new.png"), "New", self)
-        self.new_action.setStatusTip("Create a new document from scratch.")
-        self.new_action.setShortcut("Ctrl+N")
-        self.new_action.triggered.connect(self.new)
-
-        self.open_action = QAction(QIcon("icons/open.png"), "Open file", self)
-        self.open_action.setStatusTip("Open existing document")
-        self.open_action.setShortcut("Ctrl+O")
-        self.open_action.triggered.connect(self.open)
-
-        self.save_action = QAction(QIcon("icons/save.png"), "Save", self)
-        self.save_action.setStatusTip("Save document")
-        self.save_action.setShortcut("Ctrl+S")
-        self.save_action.triggered.connect(self.save)
-
-        self.print_action = QAction(QIcon("icons/print.png"), "Print document", self)
-        self.print_action.setStatusTip("Print document")
-        self.print_action.setShortcut("Ctrl+P")
-        self.print_action.triggered.connect(self.print)
-
-        self.preview_action = QAction(QIcon("icons/preview.png"), "Page view", self)
-        self.preview_action.setStatusTip("Preview page before printing")
-        self.preview_action.setShortcut("Ctrl+Shift+P")
-        self.preview_action.triggered.connect(self.preview)
-
-        self.cut_action = QAction(QIcon("icons/cut.png"), "Cut to clipboard", self)
-        self.cut_action.setStatusTip("Delete and copy text to clipboard")
-        self.cut_action.setShortcut("Ctrl+X")
-        self.cut_action.triggered.connect(self.text.cut)
-
-        self.copy_action = QAction(QIcon("icons/copy.png"), "Copy to clipboard", self)
-        self.copy_action.setStatusTip("Copy text to clipboard")
-        self.copy_action.setShortcut("Ctrl+C")
-        self.copy_action.triggered.connect(self.text.copy)
-
-        self.paste_action = QAction(QIcon("icons/paste.png"), "Paste from clipboard", self)
-        self.paste_action.setStatusTip("Paste text from clipboard")
-        self.paste_action.setShortcut("Ctrl+V")
-        self.paste_action.triggered.connect(self.text.paste)
-
-        self.undo_action = QAction(QIcon("icons/undo.png"), "Undo last action", self)
-        self.undo_action.setStatusTip("Undo last action")
-        self.undo_action.setShortcut("Ctrl+Z")
-        self.undo_action.triggered.connect(self.text.undo)
-
-        self.redo_action = QAction(QIcon("icons/redo.png"), "Redo last undone thing", self)
-        self.redo_action.setStatusTip("Redo last undone thing")
-        self.redo_action.setShortcut("Ctrl+Y")
-        self.redo_action.triggered.connect(self.text.redo)
-
-        bullet_action = QAction(QIcon("icons/bullet.png"), "Insert bullet List", self)
-        bullet_action.setStatusTip("Insert bullet list")
-        bullet_action.setShortcut("Ctrl+Shift+B")
-        bullet_action.triggered.connect(self.bullet_list)
-
-        numbered_action = QAction(QIcon("icons/number.png"), "Insert numbered List", self)
-        numbered_action.setStatusTip("Insert numbered list")
-        numbered_action.setShortcut("Ctrl+Shift+L")
-        numbered_action.triggered.connect(self.number_list)
-
-        self.find_action = QAction(QIcon("icons/find.png"), "Find and replace", self)
-        self.find_action.setStatusTip("Find and replace words in your document")
-        self.find_action.setShortcut("Ctrl+F")
-        self.find_action.triggered.connect(find.Find(self).show)
-
-        image_action = QAction(QIcon("icons/image.png"), "Insert image", self)
-        image_action.setStatusTip("Insert image")
-        image_action.setShortcut("Ctrl+Shift+I")
-        image_action.triggered.connect(self.insert_image)
-
-        word_count_action = QAction(QIcon("icons/count.png"), "See word/symbol count", self)
-        word_count_action.setStatusTip("See word/symbol count")
-        word_count_action.setShortcut("Ctrl+W")
-        word_count_action.triggered.connect(self.word_count)
-
-        date_time_action = QAction(QIcon("icons/calender.png"), "Insert current date/time", self)
-        date_time_action.setStatusTip("Insert current date/time")
-        date_time_action.setShortcut("Ctrl+D")
-        date_time_action.triggered.connect(datetime.DateTime(self).show)
-
-        table_action = QAction(QIcon("icons/table.png"), "Insert table", self)
-        table_action.setStatusTip("Insert table")
-        table_action.setShortcut("Ctrl+T")
-        table_action.triggered.connect(table.Table(self).show)
-
-        self.toolbar = self.addToolBar("Options")
-
-        self.toolbar.addAction(self.new_action)
-        self.toolbar.addAction(self.open_action)
-        self.toolbar.addAction(self.save_action)
-
-        self.toolbar.addSeparator()
-
-        self.toolbar.addAction(self.print_action)
-        self.toolbar.addAction(self.preview_action)
-
-        self.toolbar.addSeparator()
-
-        self.toolbar.addAction(self.cut_action)
-        self.toolbar.addAction(self.copy_action)
-        self.toolbar.addAction(self.paste_action)
-        self.toolbar.addAction(self.undo_action)
-        self.toolbar.addAction(self.redo_action)
-
-        self.toolbar.addSeparator()
-
-        self.toolbar.addAction(word_count_action)
-        self.toolbar.addAction(image_action)
-        self.toolbar.addAction(self.find_action)
-
-        self.toolbar.addSeparator()
-
-        self.toolbar.addAction(bullet_action)
-        self.toolbar.addAction(numbered_action)
-
-        self.toolbar.addAction(date_time_action)
-
-        self.toolbar.addAction(table_action)
-
-        self.addToolBarBreak()
-
     def init_ui(self):
         self.text = QTextEdit(self)
 
         self.text.setTabStopWidth(33)
 
-        self.init_tool_bar()
+        ToolBar.init_tool_bar(self)
         Lexic.init_format_bar(self)
         MenuBar.init_menu_bar(self)
         self.setCentralWidget(self.text)
