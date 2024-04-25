@@ -4,6 +4,7 @@ from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrintDialog
 from PyQt5.QtWidgets import QMainWindow, QTextEdit, QAction, QFileDialog, QDialog, QFontComboBox, \
     QComboBox, QColorDialog, QMessageBox, QMenu, QSpinBox
 from src.ext import *
+from src.Lexic import Lexic
 
 
 class TextEditor(QMainWindow):
@@ -139,93 +140,6 @@ class TextEditor(QMainWindow):
 
         self.addToolBarBreak()
 
-    def init_format_bar(self):
-        font_box = QFontComboBox(self)
-        font_box.currentFontChanged.connect(lambda font: self.text.setCurrentFont(font))
-
-        font_size = QSpinBox(self)
-
-        font_size.setSuffix(" pt")
-
-        font_size.valueChanged.connect(lambda size: self.text.setFontPointSize(size))
-
-        font_size.setValue(14)
-
-        font_color = QAction(QIcon("icons/font-color.png"), "Change font color", self)
-        font_color.triggered.connect(self.font_color)
-
-        bold_action = QAction(QIcon("icons/bold.png"), "Bold", self)
-        bold_action.triggered.connect(self.bold)
-
-        italic_action = QAction(QIcon("icons/italic.png"), "Italic", self)
-        italic_action.triggered.connect(self.italic)
-
-        underl_action = QAction(QIcon("icons/underline.png"), "Underline", self)
-        underl_action.triggered.connect(self.underline)
-
-        strike_action = QAction(QIcon("icons/strike.png"), "Strike-out", self)
-        strike_action.triggered.connect(self.strike)
-
-        super_action = QAction(QIcon("icons/superscript.png"), "Superscript", self)
-        super_action.triggered.connect(self.super_script)
-
-        sub_action = QAction(QIcon("icons/subscript.png"), "Subscript", self)
-        sub_action.triggered.connect(self.sub_script)
-
-        align_left = QAction(QIcon("icons/align-left.png"), "Align left", self)
-        align_left.triggered.connect(self.align_left)
-
-        align_center = QAction(QIcon("icons/align-center.png"), "Align center", self)
-        align_center.triggered.connect(self.align_center)
-
-        align_right = QAction(QIcon("icons/align-right.png"), "Align right", self)
-        align_right.triggered.connect(self.align_right)
-
-        align_justify = QAction(QIcon("icons/align-justify.png"), "Align justify", self)
-        align_justify.triggered.connect(self.align_justify)
-
-        indent_action = QAction(QIcon("icons/indent.png"), "Indent Area", self)
-        indent_action.setShortcut("Ctrl+Tab")
-        indent_action.triggered.connect(self.indent)
-
-        dedent_action = QAction(QIcon("icons/dedent.png"), "Dedent Area", self)
-        dedent_action.setShortcut("Shift+Tab")
-        dedent_action.triggered.connect(self.dedent)
-
-        back_color = QAction(QIcon("icons/highlight.png"), "Change background color", self)
-        back_color.triggered.connect(self.highlight)
-
-        self.formatbar = self.addToolBar("Format")
-
-        self.formatbar.addWidget(font_box)
-        self.formatbar.addWidget(font_size)
-
-        self.formatbar.addSeparator()
-
-        self.formatbar.addAction(font_color)
-        self.formatbar.addAction(back_color)
-
-        self.formatbar.addSeparator()
-
-        self.formatbar.addAction(bold_action)
-        self.formatbar.addAction(italic_action)
-        self.formatbar.addAction(underl_action)
-        self.formatbar.addAction(strike_action)
-        self.formatbar.addAction(super_action)
-        self.formatbar.addAction(sub_action)
-
-        self.formatbar.addSeparator()
-
-        self.formatbar.addAction(align_left)
-        self.formatbar.addAction(align_center)
-        self.formatbar.addAction(align_right)
-        self.formatbar.addAction(align_justify)
-
-        self.formatbar.addSeparator()
-
-        self.formatbar.addAction(indent_action)
-        self.formatbar.addAction(dedent_action)
-
     def init_menu_bar(self):
         menubar = self.menuBar()
 
@@ -264,7 +178,7 @@ class TextEditor(QMainWindow):
         self.text.setTabStopWidth(33)
 
         self.init_tool_bar()
-        self.init_format_bar()
+        Lexic.init_format_bar(self)
         self.init_menu_bar()
 
         self.setCentralWidget(self.text)
@@ -279,100 +193,8 @@ class TextEditor(QMainWindow):
         self.text.textChanged.connect(self.changed)
 
         self.setGeometry(100, 100, 1030, 800)
-        self.setWindowTitle("Writer")
+        self.setWindowTitle("MyOwnTexteditor")
         self.setWindowIcon(QIcon("icons/icon.png"))
-
-    def font_family(self, font):
-        self.text.setCurrentFont(font)
-
-    def font_size(self, font_size):
-        self.text.setFontPointSize(int(font_size))
-
-    def font_color(self):
-
-        color = QColorDialog.getColor()
-
-        self.text.setTextColor(color)
-
-    def highlight(self):
-
-        color = QColorDialog.getColor()
-
-        self.text.setTextBackgroundColor(color)
-
-    def bold(self):
-
-        if self.text.fontWeight() == QFont.Bold:
-
-            self.text.setFontWeight(QFont.Normal)
-
-        else:
-
-            self.text.setFontWeight(QFont.Bold)
-
-    def italic(self):
-
-        state = self.text.fontItalic()
-
-        self.text.setFontItalic(not state)
-
-    def underline(self):
-
-        state = self.text.fontUnderline()
-
-        self.text.setFontUnderline(not state)
-
-    def strike(self):
-
-        fmt = self.text.currentCharFormat()
-
-        fmt.setFontStrikeOut(not fmt.fontStrikeOut())
-
-        self.text.setCurrentCharFormat(fmt)
-
-    def super_script(self):
-
-        fmt = self.text.currentCharFormat()
-
-        align = fmt.verticalAlignment()
-
-        if align == QTextCharFormat.AlignNormal:
-
-            fmt.setVerticalAlignment(QTextCharFormat.AlignSuperScript)
-
-        else:
-
-            fmt.setVerticalAlignment(QTextCharFormat.AlignNormal)
-
-        self.text.setCurrentCharFormat(fmt)
-
-    def sub_script(self):
-
-        fmt = self.text.currentCharFormat()
-
-        align = fmt.verticalAlignment()
-
-        if align == QTextCharFormat.AlignNormal:
-
-            fmt.setVerticalAlignment(QTextCharFormat.AlignSubScript)
-
-        else:
-
-            fmt.setVerticalAlignment(QTextCharFormat.AlignNormal)
-
-        self.text.setCurrentCharFormat(fmt)
-
-    def align_left(self):
-        self.text.setAlignment(Qt.AlignLeft)
-
-    def align_right(self):
-        self.text.setAlignment(Qt.AlignRight)
-
-    def align_center(self):
-        self.text.setAlignment(Qt.AlignCenter)
-
-    def align_justify(self):
-        self.text.setAlignment(Qt.AlignJustify)
 
     @staticmethod
     def new():
@@ -688,6 +510,3 @@ class TextEditor(QMainWindow):
                 event.accept()
             else:
                 event.ignore()
-
-
-
